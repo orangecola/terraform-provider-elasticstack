@@ -37,10 +37,11 @@ type integrationPolicyModel struct {
 }
 
 type integrationPolicyInputsModel struct {
-	Enabled  types.Bool           `tfsdk:"enabled"`
-	Vars     jsontypes.Normalized `tfsdk:"vars"`
-	Defaults types.Object         `tfsdk:"defaults"` //> inputDefaultsModel
-	Streams  types.Map            `tfsdk:"streams"`  //> integrationPolicyInputStreamModel
+	Enabled    types.Bool           `tfsdk:"enabled"`
+	Vars       jsontypes.Normalized `tfsdk:"vars"`
+	ConfigJson jsontypes.Normalized `tfsdk:"config_json"`
+	Defaults   types.Object         `tfsdk:"defaults"` //> inputDefaultsModel
+	Streams    types.Map            `tfsdk:"streams"`   //> integrationPolicyInputStreamModel
 }
 
 type integrationPolicyInputStreamModel struct {
@@ -164,8 +165,9 @@ func (model *integrationPolicyModel) populateInputsFromAPI(ctx context.Context, 
 	newInputs := make(map[string]integrationPolicyInputsModel)
 	for inputID, inputData := range inputs {
 		inputModel := integrationPolicyInputsModel{
-			Enabled: types.BoolPointerValue(inputData.Enabled),
-			Vars:    utils.MapToNormalizedType(utils.Deref(inputData.Vars), path.Root("inputs").AtMapKey(inputID).AtName("vars"), diags),
+			Enabled:    types.BoolPointerValue(inputData.Enabled),
+			Vars:       utils.MapToNormalizedType(utils.Deref(inputData.Vars), path.Root("inputs").AtMapKey(inputID).AtName("vars"), diags),
+			ConfigJson: utils.MapToNormalizedType(utils.Deref(inputData.Config), path.Root("inputs").AtMapKey(inputID).AtName("config_json"), diags),
 		}
 
 		// Populate streams
@@ -293,6 +295,7 @@ func (model integrationPolicyModel) toAPIInputsFromInputsAttribute(ctx context.C
 		apiInput := kbapi.PackagePolicyRequestInput{
 			Enabled: inputModel.Enabled.ValueBoolPointer(),
 			Vars:    utils.MapRef(utils.NormalizedTypeToMap[any](inputModel.Vars, inputPath.AtName("vars"), diags)),
+			Config:  utils.MapRef(utils.NormalizedTypeToMap[any](inputModel.ConfigJson, inputPath.AtName("config_json"), diags)),
 		}
 
 		// Convert streams if present

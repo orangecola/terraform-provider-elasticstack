@@ -178,6 +178,21 @@ func (v InputValue) ObjectSemanticEquals(ctx context.Context, newValuable basety
 		return false, diags
 	}
 
+	// Compare config_json using semantic equality if both are known
+	if utils.IsKnown(oldInputWithDefaults.ConfigJson) && utils.IsKnown(newInputWithDefaults.ConfigJson) {
+		configEqual, d := oldInputWithDefaults.ConfigJson.StringSemanticEquals(ctx, newInputWithDefaults.ConfigJson)
+		diags.Append(d...)
+		if diags.HasError() {
+			return false, diags
+		}
+		if !configEqual {
+			return false, diags
+		}
+	} else if !oldInputWithDefaults.ConfigJson.Equal(newInputWithDefaults.ConfigJson) {
+		// If one is null/unknown, use regular equality
+		return false, diags
+	}
+
 	// Compare streams
 	streamsEqual, d := compareStreams(ctx, oldInputWithDefaults, newInputWithDefaults)
 	diags.Append(d...)

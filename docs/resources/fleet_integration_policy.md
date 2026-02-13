@@ -115,6 +115,7 @@ The provider injects the '__tf_provider_context' property into this JSON object.
 
 Optional:
 
+- `config_json` (String, Sensitive) Input-level configuration as JSON. Used by integrations like Elastic Defend that use config objects instead of streams. The JSON object should map config keys to objects with a 'value' field.
 - `enabled` (Boolean) Enable the input.
 - `streams` (Attributes Map) Input streams mapped by stream ID. (see [below for nested schema](#nestedatt--inputs--streams))
 - `vars` (String, Sensitive) Input-level variables as JSON.

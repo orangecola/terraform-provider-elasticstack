@@ -115,6 +115,7 @@ func HandleRespSecrets(ctx context.Context, resp *kbapi.PackagePolicy, private p
 	handleVars(utils.Deref(resp.Vars))
 	for _, input := range resp.Inputs {
 		handleVars(utils.Deref(input.Vars))
+		handleVars(utils.Deref(input.Config))
 		for _, stream := range utils.Deref(input.Streams) {
 			handleVars(utils.Deref(stream.Vars))
 		}
@@ -192,6 +193,7 @@ func HandleReqRespSecrets(ctx context.Context, req kbapi.PackagePolicyRequest, r
 	for inputID, inputReq := range utils.Deref(req.Inputs) {
 		inputResp := resp.Inputs[inputID]
 		handleVars(utils.Deref(inputReq.Vars), utils.Deref(inputResp.Vars))
+		handleVars(utils.Deref(inputReq.Config), utils.Deref(inputResp.Config))
 		streamsResp := utils.Deref(inputResp.Streams)
 		for streamID, streamReq := range utils.Deref(inputReq.Streams) {
 			streamResp := streamsResp[streamID]

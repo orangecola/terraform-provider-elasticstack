@@ -155,6 +155,12 @@ func getInputsNestedObject(varsAreSensitive bool) schema.NestedAttributeObject {
 				Optional:    true,
 				Sensitive:   varsAreSensitive,
 			},
+			"config_json": schema.StringAttribute{
+				Description: "Input-level configuration as JSON. Used by integrations like Elastic Defend that use config objects instead of streams. The JSON object should map config keys to objects with a 'value' field.",
+				CustomType:  jsontypes.NormalizedType{},
+				Optional:    true,
+				Sensitive:   varsAreSensitive,
+			},
 			"defaults": schema.SingleNestedAttribute{
 				Description: "Input defaults.",
 				Computed:    true,
@@ -220,8 +226,9 @@ func getInputsElementType() InputType {
 
 func getInputsAttributeTypes() map[string]attr.Type {
 	return map[string]attr.Type{
-		"enabled": types.BoolType,
-		"vars":    jsontypes.NormalizedType{},
+		"enabled":     types.BoolType,
+		"vars":        jsontypes.NormalizedType{},
+		"config_json": jsontypes.NormalizedType{},
 		"defaults": types.ObjectType{
 			AttrTypes: map[string]attr.Type{
 				"vars": jsontypes.NormalizedType{},
